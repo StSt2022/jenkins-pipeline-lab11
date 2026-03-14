@@ -4,7 +4,7 @@ pipeline {
   stage('Build') { 
    steps { 
     echo 'Building Docker image...' 
-    sh 'docker build -t myapp:latest .' 
+    sh 'docker build -t stst21123/myapp:latest .' 
    } 
   } 
   stage('Test') { 
@@ -15,8 +15,14 @@ pipeline {
   } 
   stage('Deploy') { 
    steps { 
-    echo 'Deploy stage (локально)'
-    sh 'docker images' 
+    echo 'Pushing Docker image to DockerHub...' 
+    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', 
+                     usernameVariable: 'DOCKER_USER', 
+                     passwordVariable: 'DOCKER_PASS')]) { 
+ 
+     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin' 
+     sh 'docker push $DOCKER_USER/myapp:latest' 
+    } 
    } 
   } 
  } 
